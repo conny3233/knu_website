@@ -91,7 +91,7 @@ export function SubmitSection() {
   }
 
   return (
-    <section id="submit" className="scroll-mt-24 space-y-5" aria-labelledby="submit-title">
+    <section id="submit" data-fx className="scroll-mt-24 space-y-6" aria-labelledby="submit-title">
       <SectionHeader
         titleId="submit-title"
         mark="＋"

@@ -20,7 +20,7 @@ export function FavoriteButton({
         - transition-[color]: Tailwind 의 transition-colors 는 outline-color 까지
           물들여서 키보드 포커스 링이 서서히 붉어진다. 링은 즉시 보여야 한다.
       */
-      className="relative z-10 -m-1.5 cursor-pointer rounded-sm p-1.5 text-knu-gray transition-[color] hover:text-knu-red aria-pressed:text-knu-red"
+      className="relative z-10 -m-1.5 cursor-pointer rounded-sm p-1.5 text-knu-gray transition-[color,transform] duration-150 hover:scale-110 hover:text-knu-red active:scale-90 aria-pressed:text-knu-red"
       aria-pressed={isFavorite}
       aria-label={
         isFavorite ? `${name} 즐겨찾기 해제` : `${name} 즐겨찾기에 추가`
@@ -30,7 +30,12 @@ export function FavoriteButton({
     >
       <svg
         viewBox="0 0 24 24"
-        className="size-4"
+        /* 켜지는 순간에만 star-pop 이 한 번 튄다. 끌 때는 조용히 꺼진다. */
+        className={
+          isFavorite
+            ? "size-4 animate-[star-pop_0.35s_var(--ease-out-quart)]"
+            : "size-4"
+        }
         fill={isFavorite ? "currentColor" : "none"}
         stroke="currentColor"
         strokeWidth="1.6"

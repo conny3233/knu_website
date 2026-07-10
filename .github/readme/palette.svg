@@ -1,0 +1,58 @@
+<svg width="960" height="190" viewBox="0 0 960 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="경북대 링크 허브 색상 팔레트">
+  <defs>
+    <style>
+      .name { font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; font-size:13px; fill:#5C5650; }
+      .hex { font-family:'Consolas','IBM Plex Mono',monospace; font-size:12px; fill:#1A1714; letter-spacing:0.5px; }
+      .ratio { font-family:'Consolas','IBM Plex Mono',monospace; font-size:10.5px; fill:#797977; }
+    </style>
+  </defs>
+  <rect width="960" height="190" fill="#FBFAF8" />
+
+  <!-- paper -->
+  <g transform="translate(10,10)">
+    <rect width="150" height="110" fill="#FBFAF8" stroke="#CDC6BB" stroke-width="1.5" />
+    <text x="0" y="130" class="name">paper</text>
+    <text x="0" y="148" class="hex">#FBFAF8</text>
+    <text x="0" y="164" class="ratio">배경 · 순백 아님</text>
+  </g>
+
+  <!-- ink -->
+  <g transform="translate(172,10)">
+    <rect width="150" height="110" fill="#1A1714" />
+    <text x="0" y="130" class="name">ink</text>
+    <text x="0" y="148" class="hex">#1A1714</text>
+    <text x="0" y="164" class="ratio">17.11:1 AAA</text>
+  </g>
+
+  <!-- knu-red -->
+  <g transform="translate(334,10)">
+    <rect width="150" height="110" fill="#E60000" />
+    <text x="0" y="130" class="name">knu-red</text>
+    <text x="0" y="148" class="hex">#E60000</text>
+    <text x="0" y="164" class="ratio">4.61:1 · 대면적 액센트</text>
+  </g>
+
+  <!-- knu-red-ink -->
+  <g transform="translate(496,10)">
+    <rect width="150" height="110" fill="#B00000" />
+    <text x="0" y="130" class="name">knu-red-ink</text>
+    <text x="0" y="148" class="hex">#B00000</text>
+    <text x="0" y="164" class="ratio">7.07:1 AAA · 텍스트/링크</text>
+  </g>
+
+  <!-- knu-gray -->
+  <g transform="translate(658,10)">
+    <rect width="150" height="110" fill="#797977" />
+    <text x="0" y="130" class="name">knu-gray</text>
+    <text x="0" y="148" class="hex">#797977</text>
+    <text x="0" y="164" class="ratio">4.18:1 · 보더 전용</text>
+  </g>
+
+  <!-- muted -->
+  <g transform="translate(820,10)">
+    <rect width="130" height="110" fill="#5C5650" />
+    <text x="0" y="130" class="name">muted</text>
+    <text x="0" y="148" class="hex">#5C5650</text>
+    <text x="0" y="164" class="ratio">6.94:1 AA</text>
+  </g>
+</svg>

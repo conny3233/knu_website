@@ -43,7 +43,7 @@
 
 html {
   scroll-behavior: smooth;
-  /* 스티키 헤더 높이만큼 앵커 오프셋 */
+  /* 스티키 헤더 높이만큼. 섹션 쪽 scroll-mt 와 합산된다 */
   scroll-padding-top: 5.5rem;
 }
 
@@ -54,6 +54,8 @@ body {
   font-feature-settings: "tnum" 1; /* 표 숫자 — DIN 대체의 최소 예의 */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* 히어로 천문도가 오른쪽으로 흘러넘쳐도 가로 스크롤이 생기지 않게 */
+  overflow-x: clip;
 }
 
 /*
@@ -128,7 +130,7 @@ body::before {
   letter-spacing: 0.1em;
 }
 
-/* 페이지 로드 시 계단식 등장. 각 요소가 --i 만큼 늦게 뜬다. */
+/* 페이지 로드 시 계단식 등장. 각 요소가 --i 만큼 늦게 뜬다. (히어로 전용) */
 @utility reveal {
   animation: reveal 0.7s var(--ease-out-quart) backwards;
   animation-delay: calc(var(--i, 0) * 60ms);
@@ -153,6 +155,136 @@ body::before {
   }
   50% {
     opacity: 1;
+  }
+}
+
+/* 즐겨찾기에 별이 켜질 때 — 짧게 부풀었다 자리를 잡는다 */
+@keyframes star-pop {
+  0% {
+    transform: scale(0.5) rotate(-20deg);
+  }
+  60% {
+    transform: scale(1.3) rotate(8deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* ── 스크롤 연출 ──────────────────────────────────────────────
+   화면에 들어올 때 한 번 떠오른다. ScrollFx(IntersectionObserver)가
+   .fx-in 을 붙인다. JS가 없으면 html.js 도 없으므로 항상 보인다.       */
+
+html.js [data-fx] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.8s var(--ease-out-quart),
+    transform 0.8s var(--ease-out-quart);
+  transition-delay: calc(var(--fx-i, 0) * 80ms);
+}
+
+html.js [data-fx].fx-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* 스티키 헤더 — 스크롤이 시작되면 지면에서 살짝 뜬다 */
+.site-header {
+  transition:
+    box-shadow 0.3s var(--ease-out-quart),
+    background-color 0.3s var(--ease-out-quart);
+}
+
+html[data-scrolled] .site-header {
+  box-shadow:
+    0 1px 0 var(--color-rule),
+    0 12px 32px -20px rgb(26 23 20 / 0.18);
+}
+
+/* ── 성도(星圖) — 히어로 천문도 ──────────────────────────────── */
+
+/* 별들의 궤도가 아주 느리게 돈다. 4분에 한 바퀴 — 알아챌 듯 말 듯 */
+@keyframes chart-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.chart-orbit {
+  animation: chart-orbit 240s linear infinite;
+  transform-origin: center;
+  transform-box: view-box;
+}
+
+/* 하늘의 눈금이 반대로, 더 느리게 */
+.chart-orbit-reverse {
+  animation: chart-orbit 360s linear infinite reverse;
+  transform-origin: center;
+  transform-box: view-box;
+}
+
+/* 관측 기록이 그려지듯 — 원이 한 획씩 나타난다 */
+@keyframes chart-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.chart-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: chart-draw 1.6s var(--ease-out-quart) forwards;
+  animation-delay: calc(var(--draw-i, 0) * 200ms);
+}
+
+/* ── 고스트 숫자 — 섹션 카탈로그 번호의 판각(板刻) ─────────────── */
+
+@utility ghost-num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(230 0 0 / 0.22);
+  user-select: none;
+}
+
+@supports not (-webkit-text-stroke: 1px red) {
+  .ghost-num {
+    color: rgb(230 0 0 / 0.08);
+  }
+}
+
+/* ── 목차 점선 리더 — 인쇄물의 결 ────────────────────────────── */
+
+@utility dot-leader {
+  flex: 1 1 1rem;
+  min-width: 1rem;
+  border-bottom: 1px dotted var(--color-rule-strong);
+  transform: translateY(-0.35em);
+}
+
+/* ── 히어로 밑줄 — 형광펜이 왼쪽에서 오른쪽으로 그어진다 ───────── */
+
+@utility hero-underline {
+  background-image: linear-gradient(
+    to top,
+    rgb(230 0 0 / 0.24) 34%,
+    transparent 34%
+  );
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  animation: underline-draw 0.9s var(--ease-out-quart) 0.55s forwards;
+}
+
+@keyframes underline-draw {
+  to {
+    background-size: 100% 100%;
   }
 }
 

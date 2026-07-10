@@ -1,4 +1,5 @@
 import { LinkCard } from "@/components/link-card";
+import { LinkIndex } from "@/components/link-index";
 import { catalogMark, SectionHeader } from "@/components/section-header";
 import { CATEGORIES } from "@/lib/links/categories";
 import type { Category, KnuLink } from "@/lib/links/types";
@@ -13,23 +14,24 @@ export function LinkGrid({ links }: { links: readonly KnuLink[] }) {
   );
 }
 
+/** 이보다 많으면 카드 대신 목차식 색인으로 깐다 */
+const INDEX_THRESHOLD = 24;
+
 export function CategorySection({
   category,
   links,
-  index,
 }: {
   category: Category;
   links: readonly KnuLink[];
-  /** 페이지 로드 시 계단식으로 등장하는 순번 */
-  index: number;
 }) {
   const meta = CATEGORIES[category];
+  const dense = links.length > INDEX_THRESHOLD;
 
   return (
     <section
       id={category}
-      className="reveal scroll-mt-24 space-y-5"
-      style={{ "--i": index } as React.CSSProperties}
+      data-fx
+      className="scroll-mt-24 space-y-6"
       aria-labelledby={`${category}-title`}
     >
       <SectionHeader
@@ -37,8 +39,9 @@ export function CategorySection({
         mark={catalogMark(meta.order)}
         title={meta.label}
         blurb={meta.blurb}
+        count={links.length}
       />
-      <LinkGrid links={links} />
+      {dense ? <LinkIndex links={links} /> : <LinkGrid links={links} />}
     </section>
   );
 }

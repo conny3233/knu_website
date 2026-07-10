@@ -1,15 +1,19 @@
 /**
  * 성도(星圖) 카탈로그의 표제행.
  *
- *   05 ─────────────────────  단과대학    약칭이 제각각이라…
+ * 카탈로그 번호를 판각(板刻)처럼 크게 — 붉은 헤어라인 윤곽선만 남긴
+ * 고스트 숫자가 제목 뒤에 서고, 제목이 그 아랫단을 딛는다.
  *
- * 번호와 제목 사이를 가느다란 괘선이 끝까지 밀어낸다. 인쇄물의 결.
+ *        ....
+ *      01
+ *      핵심 시스템  8 ──────────────────  학사의 중심…
  */
 export function SectionHeader({
   mark,
   title,
   blurb,
   titleId,
+  count,
 }: {
   /** 카탈로그 표식. 보통 "01" 같은 두 자리 번호. */
   mark: string;
@@ -17,30 +21,40 @@ export function SectionHeader({
   blurb?: string;
   /** 섹션의 aria-labelledby 가 가리키는 곳 */
   titleId?: string;
+  /** 이 구획의 링크 수 */
+  count?: number;
 }) {
   return (
-    <div className="flex items-baseline gap-3 sm:gap-4">
+    <div className="relative">
       <span
         aria-hidden
-        className="catalog-num w-7 shrink-0 text-xl leading-none text-knu-red sm:text-2xl"
+        className="ghost-num pointer-events-none absolute -top-5 -left-0.5 text-[4rem] sm:-top-7 sm:text-[5.5rem]"
       >
         {mark}
       </span>
 
-      <h2
-        id={titleId}
-        className="text-lg font-bold tracking-tight whitespace-nowrap sm:text-xl"
-      >
-        {title}
-      </h2>
+      <div className="relative flex items-baseline gap-3 pt-10 sm:gap-4 sm:pt-14">
+        <h2
+          id={titleId}
+          className="text-xl font-bold tracking-tight whitespace-nowrap sm:text-2xl"
+        >
+          {title}
+        </h2>
 
-      <span aria-hidden className="h-px min-w-4 flex-1 bg-rule" />
+        {count !== undefined && (
+          <span aria-label={`${count}개`} className="meta text-knu-red-ink">
+            {count}
+          </span>
+        )}
 
-      {blurb && (
-        <p className="hidden max-w-xs truncate text-xs text-muted lg:block">
-          {blurb}
-        </p>
-      )}
+        <span aria-hidden className="h-px min-w-4 flex-1 bg-rule" />
+
+        {blurb && (
+          <p className="hidden max-w-xs truncate text-xs text-muted lg:block">
+            {blurb}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

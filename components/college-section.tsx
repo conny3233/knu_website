@@ -19,13 +19,7 @@ const TABS: { value: Filter; label: string }[] = [
  * 단과대학 19개는 대체로 잡음이기 때문이다. 다른 카테고리는 링크가 적어
  * 필터를 붙일 값이 없다.
  */
-export function CollegeSection({
-  links,
-  index,
-}: {
-  links: readonly KnuLink[];
-  index: number;
-}) {
+export function CollegeSection({ links }: { links: readonly KnuLink[] }) {
   const [filter, setFilter] = useState<Filter>("all");
   const meta = CATEGORIES.college;
 
@@ -35,8 +29,8 @@ export function CollegeSection({
   return (
     <section
       id="college"
-      className="reveal scroll-mt-24 space-y-5"
-      style={{ "--i": index } as React.CSSProperties}
+      data-fx
+      className="scroll-mt-24 space-y-6"
       aria-labelledby="college-title"
     >
       <SectionHeader
@@ -44,6 +38,7 @@ export function CollegeSection({
         mark={catalogMark(meta.order)}
         title={meta.label}
         blurb={meta.blurb}
+        count={links.length}
       />
 
       <div

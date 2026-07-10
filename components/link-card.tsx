@@ -16,8 +16,9 @@ export function LinkCard({ link }: { link: KnuLink }) {
   return (
     <article
       className="group relative flex flex-col gap-2 border border-rule border-l-2 border-l-transparent bg-paper p-4
-                 transition-[border-color,background-color,transform] duration-200 ease-out-quart
-                 hover:-translate-y-px hover:border-rule-strong hover:border-l-knu-red hover:bg-knu-red-tint/50
+                 transition-[border-color,background-color,transform,box-shadow] duration-300 ease-out-quart
+                 hover:-translate-y-0.5 hover:border-rule-strong hover:border-l-knu-red hover:bg-knu-red-tint/40
+                 hover:shadow-[0_18px_40px_-22px_rgb(230_0_0/0.35),0_4px_14px_-8px_rgb(26_23_20/0.1)]
                  focus-within:border-l-knu-red"
     >
       <div className="flex items-start justify-between gap-2">

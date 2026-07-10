@@ -38,6 +38,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
   `outline-none` 같은 유틸리티를 항상 이겨서 지울 수 없는 붉은 테가 남는다.
 - `transition-colors`는 `outline-color`까지 포함한다. 포커스 링이 서서히
   물드는 게 싫으면 전이 대상을 좁혀라(`transition-[color]`).
+- 스크롤 리빌 `data-fx`는 **서버가 그리는 정적 섹션에만** 붙인다.
+  `ScrollFx`가 마운트 시점에 한 번만 관찰 대상을 수집하므로, fetch 뒤에
+  나타나는 클라이언트 구획(PopularLinks·PinnedRows)에 붙이면 영영 숨는다.
+  내용을 숨기는 CSS는 `html.js` 게이트 뒤에 있다 — JS가 없으면 전부 보인다.
 
 ## 4. 테스트는 `.ts` 확장자로 import 한다
 

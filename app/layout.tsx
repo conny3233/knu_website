@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Newsreader } from "next/font/google";
 import localFont from "next/font/local";
 import { PaletteProvider } from "@/components/palette-provider";
+import { ScrollFx } from "@/components/scroll-fx";
 import "./globals.css";
 
 /* 공식 지정서체 윤고딕540의 무료 대체 (OFL) */
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     template: "%s · 경북대 링크 허브",
   },
   description:
-    "수강신청, LMS, 도서관, 통합정보시스템, 단과대학 홈페이지까지. 경북대학교 관련 사이트 50여 곳을 검색 한 번으로 찾습니다.",
+    "수강신청, LMS, 도서관, 통합정보시스템, 단과대학, 부설연구소까지. 경북대학교 관련 사이트 136곳을 검색 한 번으로 찾습니다.",
   keywords: [
     "경북대",
     "경북대학교",
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     title: "경북대 링크 허브",
-    description: "경북대학교 관련 사이트 50여 곳을 검색 한 번으로.",
+    description: "경북대학교 관련 사이트 136곳을 검색 한 번으로.",
     siteName: "경북대 링크 허브",
   },
   robots: { index: true, follow: true },
@@ -73,6 +74,15 @@ export default function RootLayout({
       className={`${pretendard.variable} ${newsreader.variable} ${plexMono.variable}`}
     >
       <body className="min-h-dvh antialiased">
+        {/*
+          첫 페인트 전에 html.js 를 켠다. 스크롤 리빌(.fx)은 이 클래스가
+          있을 때만 내용을 숨기므로, JS가 없는 환경에서는 전부 그냥 보인다.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if("IntersectionObserver" in window)document.documentElement.classList.add("js")`,
+          }}
+        />
         {/* 첨성대 상단의 정자석(井字石)처럼, 붉은 띠가 지면을 인다 */}
         <div aria-hidden className="fixed inset-x-0 top-0 z-50 h-[3px] bg-knu-red" />
         <a
@@ -81,6 +91,7 @@ export default function RootLayout({
         >
           본문으로 건너뛰기
         </a>
+        <ScrollFx />
         <PaletteProvider>{children}</PaletteProvider>
       </body>
     </html>
