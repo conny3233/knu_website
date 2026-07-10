@@ -9,6 +9,8 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    // node --test 는 ESM 해석이라 확장자를 요구한다. 테스트 파일만 './rank.ts' 로 import 한다.
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",

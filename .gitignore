@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 로컬 SQLite (클릭 통계·제보). 없어도 사이트는 정상 동작한다.
+/data/*.db
+/data/*.db-*

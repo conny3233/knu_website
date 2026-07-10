@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx --yes create-next-app@latest . --ts --tailwind --eslint --app --no-src-dir --turbopack --import-alias \"@/*\" --use-npm --skip-install --yes)"
+      "Bash(npx --yes create-next-app@latest . --ts --tailwind --eslint --app --no-src-dir --turbopack --import-alias \"@/*\" --use-npm --skip-install --yes)",
+      "Bash(node \"C:/Users/User/AppData/Local/Temp/claude/c--Users-User-Desktop-knu-web-site/c754adba-faa9-4e7d-8bf9-817d48a7436e/scratchpad/contrast.mjs\")",
+      "Bash(echo \"--- typecheck exit: $? ---\")",
+      "Bash(node -e ' *)",
+      "Bash(npm test *)",
+      "Bash(node -p \"require\\('./node_modules/@types/node/package.json'\\).version\")",
+      "Bash(echo \"--- installed: $\\(node -p \"require\\('./node_modules/@types/node/package.json'\\).version\"\\)\")",
+      "Bash(npm run *)",
+      "Bash(PORT=3100 npx next start -p 3100)",
+      "Bash(tee /tmp/knu-server.log)",
+      "Bash(curl -s -o /dev/null \"http://localhost:3100/\")",
+      "Bash(rm -f data/knu.db data/knu.db-*)",
+      "Bash(rm -f data/knu.db data/knu.db-shm data/knu.db-wal)",
+      "Bash(ls data/)"
     ]
   }
 }
