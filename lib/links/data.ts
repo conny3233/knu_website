@@ -2353,13 +2353,12 @@ const RAW_LINKS = [
   },
   {
     id: "aic",
-    name: "인공지능혁신융합대학사업단(재)",
+    name: "인공지능혁신융합대학사업단",
     url: "https://aic.knu.ac.kr",
     category: "institute",
-    campus: "both",  // 캠퍼스를 확인해 필요하면 daegu/sangju로 바꾸세요
+    campus: "both",
     requiresLogin: false,
-    keywords: [],  // TODO: 검색 별칭 채우기
-    description: "자동 커밋 검증 재시도(node fetch)",
+    keywords: ["aic", "인공지능", "ai", "혁신융합대학"],
   },
 ] as const satisfies readonly KnuLink[];
 
