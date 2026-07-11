@@ -1230,6 +1230,15 @@ const RAW_LINKS = [
     requiresLogin: false,
     keywords: ["반도체설계교육", "idec"],
   },
+  {
+    id: "aerodrone",
+    name: "항공드론 혁신융합대학사업단",
+    url: "https://aerodrone.knu.ac.kr/",
+    category: "institute",
+    campus: "both",  // 캠퍼스를 확인해 필요하면 daegu/sangju로 바꾸세요
+    requiresLogin: false,
+    keywords: [],  // TODO: 검색 별칭 채우기
+  },
 
   // ─── 부설연구소 · 농업생명과학 ─────────────────────────────
   {
