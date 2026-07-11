@@ -44,3 +44,8 @@ export function NoticeProvider({ children }: { children: React.ReactNode }) {
 export function useNotice(linkId: string): NoticeItem | undefined {
   return useContext(NoticeContext).get(linkId);
 }
+
+/** 최근 발견된 공지 전체 (티커용). 발견 순서는 API가 정한 대로 둔다. */
+export function useNoticeList(): NoticeItem[] {
+  return [...useContext(NoticeContext).values()];
+}

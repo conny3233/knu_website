@@ -1,16 +1,22 @@
-import { CheomseongdaeMark } from "@/components/cheomseongdae-mark";
+import { Hobanu, KnuSignature } from "@/components/knu-mark";
 import { LINKS } from "@/lib/links/data";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-rule bg-paper-sunk">
+    <footer className="relative mt-24 overflow-hidden border-t border-rule bg-paper-sunk">
+      {/* 호반우가 오른쪽 아래에서 지면을 딛는다 — 스크롤로 나타난다 */}
+      <div
+        aria-hidden
+        data-fx
+        className="pointer-events-none absolute right-3 bottom-0 hidden w-24 opacity-90 md:block lg:right-8 lg:w-28"
+      >
+        <Hobanu className="h-auto w-full" />
+      </div>
+
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-md space-y-3">
-            <div className="flex items-center gap-2.5">
-              <CheomseongdaeMark className="size-7 text-knu-red" />
-              <span className="text-base font-bold lowercase">knu 링크 허브</span>
-            </div>
+            <KnuSignature className="h-7 w-auto" />
             <p className="text-[0.8125rem] leading-relaxed text-muted">
               경북대학교 관련 사이트 {LINKS.length}곳을 모았습니다. 학생이 만든
               비공식 사이트이며, 대학의 공식 서비스가 아닙니다. 모든 링크는 각
@@ -72,9 +78,9 @@ export function SiteFooter() {
               conny3233
             </a>
           </p>
-          <p>
-            로고와 상징은 경북대학교 CI를 참고해 직접 그린 모티프이며, 공식
-            로고 자산이 아닙니다.
+          <p className="max-w-md sm:text-right md:max-w-sm md:pr-32">
+            교표·워드마크·마스코트(호반우)는 경북대학교 공식 UI 자산입니다.
+            이 사이트는 학생이 만든 비공식 서비스로 대학과 무관합니다.
           </p>
         </div>
       </div>

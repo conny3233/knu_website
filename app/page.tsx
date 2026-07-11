@@ -1,5 +1,8 @@
 import { CategorySection, LinkGrid } from "@/components/category-section";
 import { CollegeSection } from "@/components/college-section";
+import { CountUp } from "@/components/count-up";
+import { Hobanu } from "@/components/knu-mark";
+import { NoticeTicker } from "@/components/notice-ticker";
 import { PinnedRows } from "@/components/pinned-rows";
 import { PopularLinks } from "@/components/popular-links";
 import { SearchTrigger } from "@/components/search-trigger";
@@ -46,6 +49,19 @@ function Hero() {
         <StarChart className="size-[620px]" />
       </div>
 
+      {/*
+        성도(xl)를 감춘 태블릿 폭(md~lg)에서는 텍스트 오른쪽 여백에 호반우가
+        선다. 셋(성도·호반우)이 동시에 뜨지 않고, 좁은 모바일에서는 텍스트와
+        겹치지 않도록 아예 감춘다 — 그 화면은 카운트업 모션만으로 충분하다.
+      */}
+      <div
+        aria-hidden
+        data-parallax="-0.06"
+        className="pointer-events-none absolute right-0 bottom-10 hidden w-36 opacity-95 md:block lg:w-44 xl:hidden"
+      >
+        <Hobanu className="h-auto w-full" priority />
+      </div>
+
       <div className="relative max-w-2xl">
         <p
           className="reveal meta text-knu-gray"
@@ -78,13 +94,13 @@ function Hero() {
         >
           <div className="flex items-baseline gap-2">
             <dd className="catalog-num text-4xl font-medium text-ink sm:text-[2.75rem]">
-              {LINKS.length}
+              <CountUp to={LINKS.length} />
             </dd>
             <dt className="meta text-knu-gray">links</dt>
           </div>
           <div className="flex items-baseline gap-2">
             <dd className="catalog-num text-4xl font-medium text-ink sm:text-[2.75rem]">
-              {CATEGORY_ORDER.length}
+              <CountUp to={CATEGORY_ORDER.length} />
             </dd>
             <dt className="meta text-knu-gray">categories</dt>
           </div>
@@ -107,6 +123,8 @@ export default function Home() {
 
       <main id="main" className="mx-auto max-w-6xl px-4 sm:px-6">
         <Hero />
+
+        <NoticeTicker />
 
         <PinnedRows />
 

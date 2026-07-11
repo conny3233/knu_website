@@ -319,8 +319,10 @@ flowchart LR
 국문은 **Pretendard**(OFL), 표제 숫자·영문은 **Newsreader**, 호스트명은
 **IBM Plex Mono**가 맡습니다.
 
-로고는 공식 자산을 쓰지 않습니다. 첨성대와 개교 당시 5개 단과대학·1개 대학원을 뜻하는
-6개의 별을 원 안에 배치한 모티프를 직접 SVG로 그렸습니다(`components/cheomseongdae-mark.tsx`).
+로고·워드마크·마스코트(호반우)는 경북대학교 **공식 UI 자산**을 씁니다
+(`public/brand/`, 상징·캐릭터 공식 다운로드). 히어로의 성도(星圖)만은 첨성대와 개교
+당시 5개 단과대학·1개 대학원을 뜻하는 6개의 별을 직접 SVG로 그린 장식입니다
+(`components/star-chart.tsx`). 비공식 사이트임은 푸터에 명시합니다.
 
 <br/>
 
