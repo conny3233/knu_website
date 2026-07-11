@@ -301,4 +301,16 @@ html[data-scrolled] .site-header {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  /*
+    성도의 궤도만 예외로 계속 돈다 — 2분에 3°/s로 흐르는 저대비 장식이라
+    전정기관을 자극하는 종류의 모션이 아니고, 이걸 멈추면 (Windows
+    "애니메이션 효과"를 꺼둔 기기에서) 사이트의 유일한 상시 모션이 사라진다.
+    시차·리빌·전환은 위 규칙대로 전부 죽는다.
+  */
+  .chart-orbit {
+    animation: chart-orbit 120s linear infinite !important;
+  }
+  .chart-orbit-reverse {
+    animation: chart-orbit 360s linear infinite reverse !important;
+  }
 }

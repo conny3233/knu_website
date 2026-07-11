@@ -23,6 +23,10 @@ function groupByCategory(links: readonly KnuLink[]): Map<Category, KnuLink[]> {
     if (bucket) bucket.push(link);
     else groups.set(link.category, [link]);
   }
+  // 카테고리 구획은 ㄱㄴㄷ 순. 자주 찾는 링크(큐레이션)·많이 찾는 링크(클릭수)는 예외.
+  for (const bucket of groups.values()) {
+    bucket.sort((a, b) => a.name.localeCompare(b.name, "ko"));
+  }
   return groups;
 }
 
@@ -60,19 +64,9 @@ function Hero() {
           <span className="hero-underline whitespace-nowrap">한 곳에서.</span>
         </h1>
 
-        <p
-          className="reveal mt-7 max-w-xl text-[0.9375rem] leading-relaxed text-muted sm:text-base"
-          style={{ "--i": 2 } as React.CSSProperties}
-        >
-          수강신청은 <span className="font-mono text-ink">sugang</span>, 성적은{" "}
-          <span className="font-mono text-ink">knuin</span>, 강의는{" "}
-          <span className="font-mono text-ink">lms1</span>. 규칙이라곤 없는
-          주소들을 검색 한 번으로 찾습니다.
-        </p>
-
         <div
-          className="reveal mt-9 max-w-xl"
-          style={{ "--i": 3 } as React.CSSProperties}
+          className="reveal mt-10 max-w-xl"
+          style={{ "--i": 2 } as React.CSSProperties}
         >
           <SearchTrigger variant="hero" />
         </div>
@@ -80,7 +74,7 @@ function Hero() {
         {/* 관측 기록부의 집계 — 세리프 숫자가 지면의 무게중심을 잡는다 */}
         <dl
           className="reveal mt-12 flex items-baseline gap-10"
-          style={{ "--i": 4 } as React.CSSProperties}
+          style={{ "--i": 3 } as React.CSSProperties}
         >
           <div className="flex items-baseline gap-2">
             <dd className="catalog-num text-4xl font-medium text-ink sm:text-[2.75rem]">
