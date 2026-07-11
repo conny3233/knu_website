@@ -30,25 +30,30 @@ export const CATEGORIES: Record<Category, CategoryMeta> = {
     blurb: "약칭이 제각각이라 가장 찾기 어려운 링크들",
     order: 5,
   },
+  department: {
+    label: "학과 · 전공",
+    blurb: "학부·학과 홈페이지. 주소가 학과 이름과 무관한 곳이 많다",
+    order: 6,
+  },
   admission: {
     label: "입학 · 대학원 · 국제",
     blurb: "들어오는 길과 넓히는 길",
-    order: 6,
+    order: 7,
   },
   institute: {
     label: "부속 · 지원기관",
     blurb: "정보화본부, 산학협력단, 그 밖의 살림",
-    order: 7,
+    order: 8,
   },
   hospital: {
     label: "부속병원",
     blurb: "별도 법인이라 도메인부터 다르다",
-    order: 8,
+    order: 9,
   },
   media: {
     label: "언론 · 소셜",
     blurb: "학내 소식이 흐르는 통로",
-    order: 9,
+    order: 10,
   },
 };
 

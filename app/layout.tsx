@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     template: "%s · 경북대 링크 허브",
   },
   description:
-    "수강신청, LMS, 도서관, 통합정보시스템, 단과대학, 부설연구소까지. 경북대학교 관련 사이트 136곳을 검색 한 번으로 찾습니다.",
+    "수강신청, LMS, 도서관, 통합정보시스템, 단과대학, 학과, 부설연구소까지. 경북대학교 관련 사이트 227곳을 검색 한 번으로 찾습니다.",
   keywords: [
     "경북대",
     "경북대학교",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     title: "경북대 링크 허브",
-    description: "경북대학교 관련 사이트 136곳을 검색 한 번으로.",
+    description: "경북대학교 관련 사이트 227곳을 검색 한 번으로.",
     siteName: "경북대 링크 허브",
   },
   robots: { index: true, follow: true },

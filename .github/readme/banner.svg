@@ -44,7 +44,7 @@
 
     <!-- 제목 -->
     <text x="298" y="172" font-family="Georgia, 'Noto Serif KR', 'Malgun Gothic', serif" font-size="60" font-weight="700" fill="#1A1714">경북대 링크 허브</text>
-    <text x="300" y="216" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#5C5650">학교 사이트 136곳을 한 페이지에, 검색 한 번으로</text>
+    <text x="300" y="216" font-family="'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif" font-size="24" fill="#5C5650">학교 사이트 227곳을 한 페이지에, 검색 한 번으로</text>
 
     <!-- 비공식 배지 -->
     <rect x="946" y="40" width="182" height="36" rx="18" fill="none" stroke="#B00000" stroke-width="1.3" />
@@ -52,7 +52,7 @@
 
     <!-- 하단 통계 줄 -->
     <line x1="80" y1="285" x2="1120" y2="285" stroke="#E3DED6" stroke-width="1.5" />
-    <text x="80" y="318" font-family="'Consolas','IBM Plex Mono',monospace" font-size="15" letter-spacing="1" fill="#5C5650">136 LINKS&#160;&#160;&#160;·&#160;&#160;&#160;9 CATEGORIES&#160;&#160;&#160;·&#160;&#160;&#160;NO LOGIN&#160;&#160;&#160;·&#160;&#160;&#160;⌘K TO SEARCH</text>
+    <text x="80" y="318" font-family="'Consolas','IBM Plex Mono',monospace" font-size="15" letter-spacing="1" fill="#5C5650">227 LINKS&#160;&#160;&#160;·&#160;&#160;&#160;10 CATEGORIES&#160;&#160;&#160;·&#160;&#160;&#160;NO LOGIN&#160;&#160;&#160;·&#160;&#160;&#160;⌘K TO SEARCH</text>
   </g>
 
   <rect x="1" y="1" width="1198" height="358" rx="28" fill="none" stroke="#E3DED6" stroke-width="2" />

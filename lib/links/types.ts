@@ -17,6 +17,7 @@ export type Category =
   | "library" // 도서관·학술
   | "admission" // 입학·대학원·국제교류
   | "college" // 단과대학
+  | "department" // 학과·전공 홈페이지
   | "support" // 장학·생활관·취업
   | "institute" // 부속·지원기관
   | "hospital" // 부속병원 (별도 법인)

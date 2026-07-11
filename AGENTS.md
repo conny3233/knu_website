@@ -19,7 +19,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 어댑터의 어떤 메서드도 예외를 던지지 않으며, 전부 `Promise`를 돌려준다
 (Turso가 네트워크 호출이라 인터페이스 전체가 비동기다).
 
-**확인법**: `data/knu.db`를 지우고 홈을 새로고침한다. 링크 136개·검색·즐겨찾기가
+**확인법**: `data/knu.db`를 지우고 홈을 새로고침한다. 링크 227개·검색·즐겨찾기가
 그대로여야 하고, "많이 찾는 링크" 구획만 사라져야 한다.
 
 ## 2. `lib/search/rank.ts`에 런타임 import를 넣지 말 것
@@ -59,11 +59,17 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - 일부 부설연구소(`sei`·`riss`·`care`·`msrc`·`nrs`·`a3di`)는 https 자체가
   응답하지 않아 `url`이 `http://`로 등록돼 있다. 인증서 문제가 아니라
   TLS를 아예 서비스하지 않는 것이라 `healthException`과는 다른 케이스다.
+- `department`(학과·전공) 91개는 단과대학 홈페이지에서 링크를 열거해
+  전부 curl로 생존 확인한 뒤 넣었다(`dept-<slug>` id). 대부분
+  `home.knu.ac.kr/HOME/<code>`를 프레임으로 감싼 학과 도메인이다.
+  BK21 사업단·개인 연구실·영문 미러·동창회는 의도적으로 제외했다 —
+  일반 학생의 목적지가 아니거나 수명이 짧다. 24개를 넘겨 `LinkIndex`
+  (목차식)로 렌더된다.
 
 ## 6. 공지사항 감시 (`lib/notices/`)
 
 `lib/notices/sources.ts`에 등록된 사이트만 감시한다. **전체가 아니다.**
-136개 중 대부분(포털·수강신청·통합정보시스템·웹메일·LMS 등)은 로그인
+227개 중 대부분(포털·수강신청·통합정보시스템·웹메일·LMS 등)은 로그인
 게이트 뒤에 있어 비로그인으로는 공지 목록 자체를 볼 수 없고, 도서관·챗봇은
 SPA라 서버 렌더링된 HTML이 없다. 지금은 `knu-main`·`knu-en` 둘뿐이다.
 
@@ -84,5 +90,5 @@ SPA라 서버 렌더링된 HTML이 없다. 지금은 `knu-main`·`knu-en` 둘뿐
 
 ```bash
 npm run check        # 타입 + 린트 + 단위 테스트
-npm run healthcheck  # 링크 136개 생존 확인
+npm run healthcheck  # 링크 227개 생존 확인
 ```
