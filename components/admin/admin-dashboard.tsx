@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { CATEGORIES } from "@/lib/links/categories";
 import type { Category } from "@/lib/links/types";
 import type { SubmissionRow, SubmissionStatus } from "@/lib/db/adapter";
+import { buildSnippet } from "@/lib/admin/snippet";
 
 const TABS: { value: SubmissionStatus; label: string }[] = [
   { value: "pending", label: "대기중" },
@@ -29,41 +30,24 @@ const VERDICT_CLASS: Record<"up" | "warn" | "down", string> = {
   down: "text-knu-red-ink",
 };
 
-/** "https://example.knu.ac.kr/path" → "example" */
-function slugFromUrl(url: string): string {
-  try {
-    const host = new URL(url).hostname.replace(/^www\./, "");
-    const first = host.split(".")[0] ?? "link";
-    return first.toLowerCase().replace(/[^a-z0-9-]/g, "-") || "link";
-  } catch {
-    return "link";
-  }
-}
+type CommitState =
+  | { kind: "idle" }
+  | { kind: "committing" }
+  | {
+      kind: "done";
+      commitSha: string;
+      committedCount: number;
+      skippedDead: { id: number; name: string; detail: string }[];
+    }
+  | { kind: "error"; message: string };
 
-function buildSnippet(rows: SubmissionRow[], existingIds: readonly string[]): string {
-  const used = new Set(existingIds);
-  const blocks = rows.map((row) => {
-    const id = slugFromUrl(row.url);
-    const collides = used.has(id);
-    used.add(id);
-    const lines = [
-      `  {`,
-      `    id: ${JSON.stringify(id)},${collides ? "  // ⚠️ id 중복 — 값을 바꿔주세요" : ""}`,
-      `    name: ${JSON.stringify(row.name)},`,
-      `    url: ${JSON.stringify(row.url)},`,
-      `    category: ${JSON.stringify(row.category)},`,
-      `    campus: "both",  // 캠퍼스를 확인해 필요하면 daegu/sangju로 바꾸세요`,
-      `    requiresLogin: false,`,
-      `    keywords: [],  // TODO: 검색 별칭 채우기`,
-    ];
-    if (row.note) lines.push(`    description: ${JSON.stringify(row.note)},`);
-    lines.push(`  },`);
-    return lines.join("\n");
-  });
-  return blocks.join("\n");
-}
-
-export function AdminDashboard({ existingIds }: { existingIds: readonly string[] }) {
+export function AdminDashboard({
+  existingIds,
+  githubEnabled,
+}: {
+  existingIds: readonly string[];
+  githubEnabled: boolean;
+}) {
   const router = useRouter();
   const [tab, setTab] = useState<SubmissionStatus>("pending");
   const [items, setItems] = useState<SubmissionRow[]>([]);
@@ -73,6 +57,7 @@ export function AdminDashboard({ existingIds }: { existingIds: readonly string[]
   const [checkingAll, setCheckingAll] = useState(false);
   const [snippet, setSnippet] = useState<string | null>(null);
   const [copyLabel, setCopyLabel] = useState("복사");
+  const [commit, setCommit] = useState<CommitState>({ kind: "idle" });
 
   const loading = loadedTab !== tab;
 
@@ -99,6 +84,7 @@ export function AdminDashboard({ existingIds }: { existingIds: readonly string[]
     setTab(next);
     setSelected(new Set());
     setSnippet(null);
+    setCommit({ kind: "idle" });
   }
 
   function toggle(id: number) {
@@ -178,6 +164,46 @@ export function AdminDashboard({ existingIds }: { existingIds: readonly string[]
     }
   }
 
+  async function autoCommit() {
+    const ids = [...selected];
+    if (ids.length === 0) return;
+    setCommit({ kind: "committing" });
+    try {
+      const res = await fetch("/api/admin/commit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+      const data: {
+        ok?: boolean;
+        error?: string;
+        commitSha?: string;
+        committed?: number[];
+        skippedDead?: { id: number; name: string; detail: string }[];
+      } = await res.json().catch(() => ({}));
+
+      if (res.ok && data.ok) {
+        const committed = data.committed ?? [];
+        setCommit({
+          kind: "done",
+          commitSha: data.commitSha ?? "",
+          committedCount: committed.length,
+          skippedDead: data.skippedDead ?? [],
+        });
+        setItems((prev) => prev.filter((item) => !committed.includes(item.id)));
+        setSelected((prev) => {
+          const next = new Set(prev);
+          for (const id of committed) next.delete(id);
+          return next;
+        });
+      } else {
+        setCommit({ kind: "error", message: data.error ?? "반영에 실패했습니다." });
+      }
+    } catch {
+      setCommit({ kind: "error", message: "네트워크에 문제가 있습니다." });
+    }
+  }
+
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
     router.refresh();
@@ -231,11 +257,27 @@ export function AdminDashboard({ existingIds }: { existingIds: readonly string[]
               >
                 {checkingAll ? "확인 중…" : "전체 생존 확인"}
               </button>
+              {githubEnabled ? (
+                <button
+                  type="button"
+                  onClick={autoCommit}
+                  disabled={selected.size === 0 || commit.kind === "committing"}
+                  className="cursor-pointer bg-knu-red px-3 py-1.5 text-[0.8125rem] font-medium text-paper transition-colors hover:bg-knu-red-deep disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {commit.kind === "committing"
+                    ? "반영 중…"
+                    : `선택 ${selected.size}건 바로 반영`}
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={exportSelected}
                 disabled={selected.size === 0}
-                className="cursor-pointer bg-knu-red px-3 py-1.5 text-[0.8125rem] font-medium text-paper transition-colors hover:bg-knu-red-deep disabled:cursor-not-allowed disabled:opacity-40"
+                className={
+                  githubEnabled
+                    ? "cursor-pointer border border-rule px-3 py-1.5 text-[0.8125rem] transition-colors hover:border-knu-red-ink hover:text-knu-red-ink disabled:cursor-not-allowed disabled:opacity-40"
+                    : "cursor-pointer bg-knu-red px-3 py-1.5 text-[0.8125rem] font-medium text-paper transition-colors hover:bg-knu-red-deep disabled:cursor-not-allowed disabled:opacity-40"
+                }
               >
                 선택 {selected.size}건 코드로 내보내기
               </button>
@@ -335,6 +377,37 @@ export function AdminDashboard({ existingIds }: { existingIds: readonly string[]
             </table>
           </div>
         </>
+      )}
+
+      {commit.kind === "done" && (
+        <div className="mt-6 space-y-1.5 border border-rule border-l-2 border-l-knu-red bg-paper p-4 text-[0.8125rem]">
+          <p className="font-medium text-ink">
+            {commit.committedCount}건을 main에 커밋했습니다.{" "}
+            {commit.commitSha && (
+              <a
+                href={`https://github.com/conny3233/knu_website/commit/${commit.commitSha}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-knu-red-ink hover:underline"
+              >
+                {commit.commitSha.slice(0, 7)}
+              </a>
+            )}
+          </p>
+          <p className="text-muted">Vercel이 몇 분 내로 자동 재배포합니다.</p>
+          {commit.skippedDead.length > 0 && (
+            <p className="text-knu-red-ink">
+              응답 없어서 건너뛴 항목: {commit.skippedDead.map((d) => d.name).join(", ")}
+              (대기중 목록에 그대로 남아있습니다)
+            </p>
+          )}
+        </div>
+      )}
+
+      {commit.kind === "error" && (
+        <div className="mt-6 border border-rule border-l-2 border-l-knu-red bg-paper p-4 text-[0.8125rem] text-knu-red-ink">
+          {commit.message}
+        </div>
       )}
 
       {snippet && (

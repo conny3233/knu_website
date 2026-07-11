@@ -92,16 +92,33 @@ SPA라 서버 렌더링된 HTML이 없다. 지금은 `knu-main`·`knu-en` 둘뿐
 있으면 비밀번호 로그인 뒤 대기 중인 제보를 보여준다(`lib/admin/auth.ts`,
 `app/api/admin/*`, `components/admin/*`).
 
-- **이 화면은 `lib/links/data.ts`를 절대 직접 쓰지 않는다.** "코드로 내보내기"는
-  `KnuLink` 리터럴 TS를 화면에 보여줄 뿐이고, 그걸 파일에 붙여넣고 커밋하는 건
-  항상 사람이 한다. GitHub 쓰기 권한을 이 앱에 두지 않기로 한 결정과 짝을 이룬다.
 - 세션 쿠키는 비밀번호 원문이 아니라 `HMAC(ADMIN_SECRET, "admin-session")`이다.
   `ADMIN_SECRET`을 바꾸면 기존 로그인이 전부 자동으로 풀린다.
 - URL 생존 확인 로직(`lib/health/probe.ts`)은 `scripts/healthcheck.ts`와
   공유한다. 판정 규칙(5xx=UP, TLS 오류=WARN)을 한 곳에서만 바꾸면 된다.
-- 내보낸 코드의 `id`는 URL 호스트명 첫 라벨에서 뽑는다. 기존 227개와 겹치면
-  주석으로 표시하지만, 붙여넣기 전에 사람이 확인해야 한다 — id는 클릭
-  통계의 키라 대충 정하면 안 된다(§5).
+- `id`·`buildSnippet` 등 KnuLink 코드 생성 로직은 `lib/admin/snippet.ts`에 모아
+  뒀다 — 미리보기("코드로 내보내기")와 자동 커밋이 같은 함수를 쓴다.
+  `uniqueId()`가 기존 id와 겹치면 `-2`, `-3`…을 자동으로 붙이므로 충돌은
+  구조적으로 나지 않는다(id는 클릭 통계의 키라 §5).
+
+**GitHub 자동 반영** (`GITHUB_TOKEN` 환경변수, `lib/admin/github.ts`)
+
+- `/admin`에서 제보를 선택해 "바로 반영"을 누르면 서버가 GitHub Contents API로
+  `lib/links/data.ts`를 직접 읽어 새 항목을 끼워 넣고 `main`에 즉시 커밋한다.
+  Vercel이 그 커밋을 자동 배포한다. `GITHUB_TOKEN`이 없으면 이 버튼은 아예
+  숨고, "코드로 내보내기"(사람이 직접 붙여넣기)만 남는다 — 공개 웹 화면이
+  저장소 쓰기 토큰을 못 쥔 채로도 항상 동작해야 한다.
+- **`GITHUB_TOKEN`은 반드시 이 저장소 하나만 건드릴 수 있는 fine-grained PAT**여야
+  한다(Contents: Read and write만, 다른 권한·저장소는 전부 제외). 비밀번호로
+  보호돼 있다지만 공개 웹 화면이 쥔 토큰이라, 새는 경우의 피해 범위를 의도적으로
+  이 저장소로 좁혀 둔 것이다.
+- 자동 커밋 경로엔 사람이 검토하는 눈이 없으므로, `/api/admin/commit`이 대신
+  `lib/health/probe.ts`로 각 URL을 다시 확인해 응답 없는 것은 걸러내고 산 것만
+  커밋한다(§5 "접속을 확인한 URL만" 원칙을 자동화 안에서도 지키는 장치).
+  일부만 죽었으면 나머지만 커밋되고, 죽은 것은 대기중 목록에 그대로 남는다.
+- 그래도 `campus`(기본 `"both"`)와 `keywords`(빈 배열)는 커밋 후 사람이 데이터를
+  더 다듬고 싶으면 별도로 고쳐야 한다 — 제보자가 알 수 없는 정보라 자동화 대상이
+  아니다.
 
 ## 8. 명령
 
