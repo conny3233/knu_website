@@ -12,6 +12,7 @@ const CATEGORY_VALUES = [
   "library",
   "admission",
   "college",
+  "department",
   "support",
   "institute",
   "hospital",

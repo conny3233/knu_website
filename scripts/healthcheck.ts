@@ -1,3 +1,4 @@
+import { probeUrl, type Verdict } from "../lib/health/probe.ts";
 import { LINKS } from "../lib/links/data.ts";
 import type { KnuLink } from "../lib/links/types.ts";
 
@@ -20,8 +21,6 @@ import type { KnuLink } from "../lib/links/types.ts";
  * 학교가 고쳤다는 뜻이고, 그러면 데이터에서 예외를 지워야 한다.
  */
 
-type Verdict = "up" | "warn" | "down";
-
 interface Result {
   link: KnuLink;
   verdict: Verdict;
@@ -30,7 +29,6 @@ interface Result {
   expected: boolean;
 }
 
-const TIMEOUT_MS = 12_000;
 const CONCURRENCY = 8;
 
 const RED = "[31m";
@@ -39,60 +37,23 @@ const RESET = "[0m";
 
 const SIGIL: Record<Verdict, string> = { up: "✓", warn: "!", down: "✗" };
 
-/** 봇 차단을 조금이라도 덜 받도록 */
-const HEADERS = {
-  "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36",
-  "Accept-Language": "ko-KR,ko;q=0.9",
-};
-
-/** fetch 가 던진 것이 인증서 문제인가. 원인은 error.cause 사슬 깊은 곳에 있다. */
-function isTlsError(error: unknown): boolean {
-  const parts: string[] = [];
-  let cursor: unknown = error;
-  while (cursor instanceof Error) {
-    parts.push(cursor.message, (cursor as { code?: string }).code ?? "");
-    cursor = cursor.cause;
-  }
-  return /CERT|SSL|TLS|ALT_NAME|DEPTH_ZERO|self.signed/i.test(parts.join(" "));
-}
-
-function failureReason(error: unknown): string {
-  if (error instanceof Error) {
-    if (error.name === "TimeoutError") return "응답 없음 (타임아웃)";
-    const code = (error.cause as { code?: string } | undefined)?.code;
-    return code ?? error.message;
-  }
-  return String(error);
-}
-
 async function probe(link: KnuLink): Promise<Result> {
-  try {
-    const response = await fetch(link.url, {
-      redirect: "follow",
-      headers: HEADERS,
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+  const { verdict, detail } = await probeUrl(link.url);
 
+  if (verdict === "up") {
     // 응답이 왔다. 상태 코드가 무엇이든 서버는 살아 있다.
-    const serverError = response.status >= 500;
+    const serverError = detail.startsWith("HTTP 5");
     return {
       link,
-      verdict: "up",
-      detail: `HTTP ${response.status}`,
+      verdict,
+      detail,
       expected: !serverError || link.healthException === "blocks-bots",
     };
-  } catch (error) {
-    if (isTlsError(error)) {
-      return {
-        link,
-        verdict: "warn",
-        detail: "TLS 인증서 불일치",
-        expected: link.healthException === "tls-mismatch",
-      };
-    }
-    return { link, verdict: "down", detail: failureReason(error), expected: false };
   }
+  if (verdict === "warn") {
+    return { link, verdict, detail, expected: link.healthException === "tls-mismatch" };
+  }
+  return { link, verdict, detail, expected: false };
 }
 
 /** 학교 서버를 한꺼번에 두드리지 않는다 */

@@ -10,6 +10,8 @@ import {
   type PopularRow,
   type StorageAdapter,
   type SubmissionInput,
+  type SubmissionRow,
+  type SubmissionStatus,
 } from "./adapter";
 
 /**
@@ -83,6 +85,15 @@ export function createSqliteAdapter(dbPath: string): StorageAdapter {
     VALUES (?, ?, ?, ?, 'pending', ?)
   `);
 
+  const selectSubmissionsByStatus = db.prepare(`
+    SELECT id, name, url, category, note, status, created_at
+    FROM submissions WHERE status = ? ORDER BY created_at DESC
+  `);
+
+  const updateSubmissionStatusStmt = db.prepare(`
+    UPDATE submissions SET status = ? WHERE id = ?
+  `);
+
   const bumpRate = db.prepare(`
     INSERT INTO rate_limit (key, window_start, count) VALUES (?, ?, 1)
     ON CONFLICT(key, window_start) DO UPDATE SET count = count + 1
@@ -150,6 +161,40 @@ export function createSqliteAdapter(dbPath: string): StorageAdapter {
           Date.now(),
         );
         return true;
+      } catch {
+        return false;
+      }
+    },
+
+    async listSubmissions(status: SubmissionStatus) {
+      try {
+        const rows = selectSubmissionsByStatus.all(status) as {
+          id: number;
+          name: string;
+          url: string;
+          category: string;
+          note: string | null;
+          status: string;
+          created_at: number;
+        }[];
+        return rows.map<SubmissionRow>((r) => ({
+          id: r.id,
+          name: r.name,
+          url: r.url,
+          category: r.category,
+          note: r.note ?? undefined,
+          status: r.status as SubmissionStatus,
+          createdAt: r.created_at,
+        }));
+      } catch {
+        return [];
+      }
+    },
+
+    async updateSubmissionStatus(id: number, status: SubmissionStatus) {
+      try {
+        const result = updateSubmissionStatusStmt.run(status, id);
+        return result.changes > 0;
       } catch {
         return false;
       }

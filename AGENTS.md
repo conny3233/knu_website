@@ -86,7 +86,24 @@ SPA라 서버 렌더링된 HTML이 없다. 지금은 `knu-main`·`knu-en` 둘뿐
   발견된 것만이다. 사용자별 열람 여부를 추적하지 않는다 — 로그인이 없는
   사이트라 "누가 봤는지"를 알 방법이 없다.
 
-## 7. 명령
+## 7. 제보 관리 (`/admin`)
+
+`ADMIN_SECRET` 환경변수가 없으면 `/admin`은 `notFound()`다 — 기능 자체가 감춰진다.
+있으면 비밀번호 로그인 뒤 대기 중인 제보를 보여준다(`lib/admin/auth.ts`,
+`app/api/admin/*`, `components/admin/*`).
+
+- **이 화면은 `lib/links/data.ts`를 절대 직접 쓰지 않는다.** "코드로 내보내기"는
+  `KnuLink` 리터럴 TS를 화면에 보여줄 뿐이고, 그걸 파일에 붙여넣고 커밋하는 건
+  항상 사람이 한다. GitHub 쓰기 권한을 이 앱에 두지 않기로 한 결정과 짝을 이룬다.
+- 세션 쿠키는 비밀번호 원문이 아니라 `HMAC(ADMIN_SECRET, "admin-session")`이다.
+  `ADMIN_SECRET`을 바꾸면 기존 로그인이 전부 자동으로 풀린다.
+- URL 생존 확인 로직(`lib/health/probe.ts`)은 `scripts/healthcheck.ts`와
+  공유한다. 판정 규칙(5xx=UP, TLS 오류=WARN)을 한 곳에서만 바꾸면 된다.
+- 내보낸 코드의 `id`는 URL 호스트명 첫 라벨에서 뽑는다. 기존 227개와 겹치면
+  주석으로 표시하지만, 붙여넣기 전에 사람이 확인해야 한다 — id는 클릭
+  통계의 키라 대충 정하면 안 된다(§5).
+
+## 8. 명령
 
 ```bash
 npm run check        # 타입 + 린트 + 단위 테스트

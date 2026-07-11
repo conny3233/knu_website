@@ -21,6 +21,14 @@ export interface SubmissionInput {
   note?: string;
 }
 
+export type SubmissionStatus = "pending" | "done" | "rejected";
+
+export interface SubmissionRow extends SubmissionInput {
+  id: number;
+  status: SubmissionStatus;
+  createdAt: number;
+}
+
 export interface NoticeInput {
   /** 그 게시판 안에서 이 글을 가리키는 안정적인 값. lib/notices/types.ts 참고 */
   externalId: string;
@@ -54,6 +62,12 @@ export interface StorageAdapter {
 
   /** 저장에 성공했는가 */
   saveSubmission(input: SubmissionInput): Promise<boolean>;
+
+  /** 관리자 화면용. 실패하면 빈 배열 */
+  listSubmissions(status: SubmissionStatus): Promise<SubmissionRow[]>;
+
+  /** 상태 갱신에 성공했는가 */
+  updateSubmissionStatus(id: number, status: SubmissionStatus): Promise<boolean>;
 
   /** 이 키가 지금 창(window)에서 한도를 넘었는가 */
   isRateLimited(key: string, now: number): Promise<boolean>;

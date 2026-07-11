@@ -8,6 +8,8 @@ import {
   type PopularRow,
   type StorageAdapter,
   type SubmissionInput,
+  type SubmissionRow,
+  type SubmissionStatus,
 } from "./adapter";
 
 /**
@@ -117,6 +119,41 @@ export async function createTursoAdapter(
           args: [input.name, input.url, input.category, input.note ?? null, Date.now()],
         });
         return true;
+      } catch {
+        return false;
+      }
+    },
+
+    async listSubmissions(status: SubmissionStatus) {
+      try {
+        const result = await client.execute({
+          sql: `
+            SELECT id, name, url, category, note, status, created_at
+            FROM submissions WHERE status = ? ORDER BY created_at DESC
+          `,
+          args: [status],
+        });
+        return result.rows.map<SubmissionRow>((r) => ({
+          id: Number(r.id),
+          name: String(r.name),
+          url: String(r.url),
+          category: String(r.category),
+          note: r.note != null ? String(r.note) : undefined,
+          status: String(r.status) as SubmissionStatus,
+          createdAt: Number(r.created_at),
+        }));
+      } catch {
+        return [];
+      }
+    },
+
+    async updateSubmissionStatus(id: number, status: SubmissionStatus) {
+      try {
+        const result = await client.execute({
+          sql: `UPDATE submissions SET status = ? WHERE id = ?`,
+          args: [status, id],
+        });
+        return result.rowsAffected > 0;
       } catch {
         return false;
       }
