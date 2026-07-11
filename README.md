@@ -50,6 +50,7 @@
 | **즐겨찾기 · 최근 방문** | 로그인 없이 이 브라우저에만 저장됩니다. 다른 사람 계정과 섞이지 않습니다. |
 | **많이 찾는 링크** | 요즘 다른 사람들이 자주 누르는 링크를 보여줍니다. 통계가 없어도 사이트는 멀쩡히 돌아갑니다 — 이 구획만 조용히 사라질 뿐입니다. |
 | **빠진 링크 제보** | 필요한 사이트가 안 보이면 그 자리에서 바로 알려줄 수 있습니다. |
+| **새 공지 표시** | 감시 대상 사이트(지금은 경북대 홈페이지·영문 홈페이지)에 새 글이 올라오면 카드에 작은 `new` 배지가 뜹니다. 하루 한 번 확인합니다. |
 | **꾸준한 생존 확인** | `npm run healthcheck` 한 번으로 136개 링크가 실제로 살아있는지 전부 확인합니다. |
 
 <br/>
@@ -136,6 +137,7 @@ flowchart LR
 | `lib/links/types.ts` | `KnuLink` 타입. `Category`가 판별 유니온이라 카테고리를 추가하면 라벨 누락을 컴파일러가 잡아줍니다. |
 | `lib/search/rank.ts` | 초성 검색 랭커. 런타임 import가 없는 자기완결 모듈이라 `node --test`가 번들러 없이 바로 실행합니다. |
 | `lib/db/index.ts` | 어댑터 팩토리. graceful degradation이 보증되는 지점입니다. |
+| `lib/notices/sources.ts` | 공지사항을 감시할 사이트 목록. 로그인이 없는 곳만 있습니다. |
 | `scripts/healthcheck.ts` | 링크 생존 확인 스크립트. 판정 규칙은 아래에. |
 
 <details>
@@ -235,6 +237,47 @@ turso db shell <db-이름> "SELECT id, name, url, category, note FROM submission
 </details>
 
 <details>
+<summary><strong>새 공지 표시가 동작하는 방식</strong></summary>
+
+<br/>
+
+136개 링크 전부를 감시하지 않습니다. **못 합니다.** 대부분(포털·수강신청·통합정보시스템·
+웹메일·LMS 등)은 로그인 게이트 뒤에 있어 비로그인으로는 공지 목록조차 안 보이고,
+도서관·챗봇은 서버 렌더링 없는 SPA라 이 방식(HTML 파싱)으로는 읽을 수 없습니다.
+실제로 확인해보고 되는 두 곳만 `lib/notices/sources.ts`에 등록했습니다 — 경북대학교
+홈페이지(학사공지)와 영문 홈페이지.
+
+```mermaid
+flowchart LR
+    A["Vercel Cron<br/>하루 1회 (KST 06:00)"] --> B["/api/cron/check-notices"]
+    B --> C["lib/notices/sources.ts<br/>감시 대상 목록"]
+    C --> D["각 사이트 목록 페이지 fetch"]
+    D --> E["lib/notices/parse.ts<br/>정규식으로 최신 글 하나 추출"]
+    E --> F{"이전과 다른 글?"}
+    F -- 예 --> G["notices 테이블에 기록<br/>(first_seen_at = 지금)"]
+    F -- 아니오 --> H["아무 것도 안 함"]
+    G --> I["GET /api/notices"]
+    I --> J["NoticeProvider (context)"]
+    J --> K["LinkCard의 NoticeBadge"]
+```
+
+한 사이트가 실패해도(마크업이 바뀌었다거나, 응답이 느리다거나) 나머지는 그대로
+진행됩니다 — 배지 하나가 안 뜨는 것이지 cron 전체나 사이트가 죽을 이유가 없습니다.
+"새 글" 판정은 발견된 지 3일 이내(`NOTICE_NEW_WINDOW_MS`)인 것만입니다. 로그인이
+없는 사이트라 "누가 이미 봤는지"는 추적하지 않습니다 — 모두에게 같은 배지가 보입니다.
+
+**Vercel에 배포한다면**: `CRON_SECRET` 환경변수를 하나 설정해 두면
+`/api/cron/check-notices`가 그 값과 일치하는 `Authorization: Bearer` 헤더가 있을
+때만 응답합니다. 설정하지 않으면(로컬 개발) 검증 없이 열려 있어 `curl`로 바로
+찔러볼 수 있습니다. `vercel.json`의 크론 스케줄은 UTC라 `0 21 * * *`가 KST 06:00입니다.
+
+새 사이트를 감시 대상에 넣으려면 그 사이트의 공지 목록 페이지를 curl로 받아
+마크업을 확인하고, `lib/notices/parse.ts`에 파서를 하나 더한 뒤
+`lib/notices/sources.ts`에 항목을 추가하면 됩니다.
+
+</details>
+
+<details>
 <summary><strong>만들면서 내린 선택</strong></summary>
 
 <br/>
@@ -254,6 +297,9 @@ turso db shell <db-이름> "SELECT id, name, url, category, note FROM submission
   좌클릭·휠클릭·새 탭이 전혀 방해받지 않습니다.
 - **즐겨찾기·최근 방문은 `useSyncExternalStore`.** 서버 스냅샷이 빈 배열이라
   하이드레이션 불일치가 구조적으로 없습니다.
+- **공지 파서는 cheerio 없이 정규식으로 씁니다.** 감시 대상이 둘뿐이고 마크업이
+  고정적이라, HTML 파서 의존성 하나를 새로 들이는 것보다 정규식 두 벌이 더
+  단순합니다. 대상이 훨씬 늘어나면 그때 재고할 문제입니다.
 
 </details>
 

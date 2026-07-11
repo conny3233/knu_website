@@ -19,7 +19,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 어댑터의 어떤 메서드도 예외를 던지지 않으며, 전부 `Promise`를 돌려준다
 (Turso가 네트워크 호출이라 인터페이스 전체가 비동기다).
 
-**확인법**: `data/knu.db`를 지우고 홈을 새로고침한다. 링크 50개·검색·즐겨찾기가
+**확인법**: `data/knu.db`를 지우고 홈을 새로고침한다. 링크 136개·검색·즐겨찾기가
 그대로여야 하고, "많이 찾는 링크" 구획만 사라져야 한다.
 
 ## 2. `lib/search/rank.ts`에 런타임 import를 넣지 말 것
@@ -60,9 +60,29 @@ This version has breaking changes — APIs, conventions, and file structure may 
   응답하지 않아 `url`이 `http://`로 등록돼 있다. 인증서 문제가 아니라
   TLS를 아예 서비스하지 않는 것이라 `healthException`과는 다른 케이스다.
 
-## 6. 명령
+## 6. 공지사항 감시 (`lib/notices/`)
+
+`lib/notices/sources.ts`에 등록된 사이트만 감시한다. **전체가 아니다.**
+136개 중 대부분(포털·수강신청·통합정보시스템·웹메일·LMS 등)은 로그인
+게이트 뒤에 있어 비로그인으로는 공지 목록 자체를 볼 수 없고, 도서관·챗봇은
+SPA라 서버 렌더링된 HTML이 없다. 지금은 `knu-main`·`knu-en` 둘뿐이다.
+
+- 파서(`lib/notices/parse.ts`)는 정규식이다. 학교가 게시판 마크업을 바꾸면
+  조용히 빈 배열을 돌려주게 되고, 그 실패는 cron 라우트가 삼킨다 — 배지
+  하나가 안 뜨는 것이지 사이트가 죽는 게 아니다. 새 사이트를 추가할 땐
+  실제 목록 페이지를 curl로 받아 마크업을 먼저 확인하고 정규식을 맞춘다.
+- `/api/cron/check-notices`는 `CRON_SECRET` 환경변수가 있으면 그 값으로
+  `Authorization: Bearer` 헤더를 검증한다. 로컬에서는 이 변수를 안 두는
+  편이 curl로 바로 찔러보기 편하다.
+- `vercel.json`의 cron 스케줄은 UTC 기준이다(`0 21 * * *` = KST 06:00).
+  Vercel Hobby 플랜은 크론을 하루 1회로 제한한다.
+- "새 글" 판정은 `NOTICE_NEW_WINDOW_MS`(`lib/db/adapter.ts`, 기본 3일) 이내에
+  발견된 것만이다. 사용자별 열람 여부를 추적하지 않는다 — 로그인이 없는
+  사이트라 "누가 봤는지"를 알 방법이 없다.
+
+## 7. 명령
 
 ```bash
 npm run check        # 타입 + 린트 + 단위 테스트
-npm run healthcheck  # 링크 137개 생존 확인
+npm run healthcheck  # 링크 136개 생존 확인
 ```

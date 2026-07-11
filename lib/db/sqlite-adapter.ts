@@ -2,8 +2,11 @@ import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import {
+  NOTICE_NEW_WINDOW_MS,
   RATE_LIMIT_MAX,
   RATE_LIMIT_WINDOW_MS,
+  type NoticeInput,
+  type NoticeRow,
   type PopularRow,
   type StorageAdapter,
   type SubmissionInput,
@@ -39,6 +42,15 @@ const SCHEMA = `
     window_start INTEGER NOT NULL,
     count        INTEGER NOT NULL,
     PRIMARY KEY (key, window_start)
+  );
+
+  CREATE TABLE IF NOT EXISTS notices (
+    link_id       TEXT PRIMARY KEY,
+    external_id   TEXT NOT NULL,
+    title         TEXT NOT NULL,
+    url           TEXT NOT NULL,
+    first_seen_at INTEGER NOT NULL,
+    checked_at    INTEGER NOT NULL
   );
 `;
 
@@ -79,6 +91,25 @@ export function createSqliteAdapter(dbPath: string): StorageAdapter {
   const readRate = db.prepare(
     `SELECT count FROM rate_limit WHERE key = ? AND window_start = ?`,
   );
+
+  const upsertNotice = db.prepare(`
+    INSERT INTO notices (link_id, external_id, title, url, first_seen_at, checked_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+    ON CONFLICT(link_id) DO UPDATE SET
+      external_id   = excluded.external_id,
+      title         = excluded.title,
+      url           = excluded.url,
+      first_seen_at = CASE
+        WHEN notices.external_id != excluded.external_id THEN excluded.first_seen_at
+        ELSE notices.first_seen_at
+      END,
+      checked_at    = excluded.checked_at
+  `);
+
+  const selectRecentNotices = db.prepare(`
+    SELECT link_id, title, url, first_seen_at FROM notices
+    WHERE first_seen_at >= ? ORDER BY first_seen_at DESC
+  `);
 
   return {
     kind: "sqlite",
@@ -145,6 +176,33 @@ export function createSqliteAdapter(dbPath: string): StorageAdapter {
       } catch {
         // 카운터가 고장 났다고 제보를 막지는 않는다
         return false;
+      }
+    },
+
+    async recordNotice(linkId: string, notice: NoticeInput, now: number) {
+      try {
+        upsertNotice.run(linkId, notice.externalId, notice.title, notice.url, now, now);
+      } catch {
+        // 배지 하나 못 다는 것이다. 삼킨다.
+      }
+    },
+
+    async getRecentNotices(now: number) {
+      try {
+        const rows = selectRecentNotices.all(now - NOTICE_NEW_WINDOW_MS) as {
+          link_id: string;
+          title: string;
+          url: string;
+          first_seen_at: number;
+        }[];
+        return rows.map<NoticeRow>((r) => ({
+          linkId: r.link_id,
+          title: r.title,
+          url: r.url,
+          firstSeenAt: r.first_seen_at,
+        }));
+      } catch {
+        return [];
       }
     },
   };

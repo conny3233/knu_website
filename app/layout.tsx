@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Newsreader } from "next/font/google";
 import localFont from "next/font/local";
+import { NoticeProvider } from "@/components/notice-provider";
 import { PaletteProvider } from "@/components/palette-provider";
 import { ScrollFx } from "@/components/scroll-fx";
 import "./globals.css";
@@ -92,7 +93,9 @@ export default function RootLayout({
           본문으로 건너뛰기
         </a>
         <ScrollFx />
-        <PaletteProvider>{children}</PaletteProvider>
+        <NoticeProvider>
+          <PaletteProvider>{children}</PaletteProvider>
+        </NoticeProvider>
       </body>
     </html>
   );

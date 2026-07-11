@@ -1,5 +1,6 @@
 import { FavoriteButton } from "@/components/favorite-button";
 import { HealthBadge } from "@/components/health-badge";
+import { NoticeBadge } from "@/components/notice-badge";
 import { TrackedLink } from "@/components/tracked-link";
 import { hostname } from "@/lib/links/url";
 import type { KnuLink } from "@/lib/links/types";
@@ -22,7 +23,7 @@ export function LinkCard({ link }: { link: KnuLink }) {
                  focus-within:border-l-knu-red"
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-[0.9375rem] leading-snug font-semibold tracking-tight">
+        <h3 className="flex min-w-0 items-center gap-1.5 text-[0.9375rem] leading-snug font-semibold tracking-tight">
           {/*
             ::after 로 카드 전체를 덮어 어디를 눌러도 링크가 열리게 한다.
             앵커의 접근 가능한 이름은 링크 이름 그대로 남는다.
@@ -30,10 +31,11 @@ export function LinkCard({ link }: { link: KnuLink }) {
           <TrackedLink
             linkId={link.id}
             href={link.url}
-            className="after:absolute after:inset-0 after:content-[''] group-hover:text-knu-red-ink"
+            className="truncate after:absolute after:inset-0 after:content-[''] group-hover:text-knu-red-ink"
           >
             {link.name}
           </TrackedLink>
+          <NoticeBadge linkId={link.id} />
         </h3>
 
         <div className="flex shrink-0 items-center gap-1.5">

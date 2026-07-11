@@ -1,4 +1,4 @@
-import type { PopularRow, StorageAdapter } from "./adapter";
+import type { NoticeRow, PopularRow, StorageAdapter } from "./adapter";
 
 /**
  * 저장소가 없을 때의 저장소.
@@ -19,5 +19,9 @@ export const nullAdapter: StorageAdapter = {
   },
   async isRateLimited() {
     return false;
+  },
+  async recordNotice() {},
+  async getRecentNotices(): Promise<NoticeRow[]> {
+    return [];
   },
 };
