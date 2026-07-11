@@ -204,7 +204,7 @@ html[data-scrolled] .site-header {
 
 /* ── 성도(星圖) — 히어로 천문도 ──────────────────────────────── */
 
-/* 별들의 궤도가 아주 느리게 돈다. 4분에 한 바퀴 — 알아챌 듯 말 듯 */
+/* 별들의 궤도가 느리게 돈다. 2분에 한 바퀴 — 알아챌 듯 말 듯 */
 @keyframes chart-orbit {
   to {
     transform: rotate(360deg);
@@ -212,7 +212,7 @@ html[data-scrolled] .site-header {
 }
 
 .chart-orbit {
-  animation: chart-orbit 240s linear infinite;
+  animation: chart-orbit 120s linear infinite;
   transform-origin: center;
   transform-box: view-box;
 }
