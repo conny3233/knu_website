@@ -55,6 +55,16 @@ export function SiteFooter() {
                   GitHub — 만든 사람
                 </a>
               </li>
+              <li>
+                <a
+                  href="https://github.com/conny3233/knu_website#readme"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted transition-colors hover:text-knu-red-ink"
+                >
+                  이 사이트는 어떻게 만들어졌나요?
+                </a>
+              </li>
             </ul>
           </div>
         </div>
