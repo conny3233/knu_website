@@ -20,17 +20,11 @@ const CATEGORY_VALUES = [
 ] as const satisfies readonly Category[];
 
 /**
- * 받아 줄 도메인. 경북대와 무관한 링크가 쌓이는 것을 막는 1차 방어선이다.
- * NullAdapter라 레이트리밋이 없는 환경에서는 이게 사실상 유일한 방어선이 된다.
+ * 도메인은 더 이상 제한하지 않는다 — 경북대와 직접 관련 없는 학생 단체·동아리
+ * 사이트도 제보받기 위해서다. 대신 실제 반영은 관리자가 /admin에서 직접
+ * 검토·승인해야만 일어난다(lib/admin/commit). 프로토콜만 http(s)로 제한해
+ * javascript:·data: 같은 스킴은 막는다.
  */
-const ALLOWED_HOSTS = [
-  "knu.ac.kr",
-  "knuh.kr",
-  "knuch.kr",
-  "knudh.kr",
-  "knupresscenter.com",
-] as const;
-
 export function isAllowedUrl(raw: string): boolean {
   let url: URL;
   try {
@@ -38,12 +32,7 @@ export function isAllowedUrl(raw: string): boolean {
   } catch {
     return false;
   }
-  if (url.protocol !== "https:" && url.protocol !== "http:") return false;
-
-  const host = url.hostname.toLowerCase();
-  return ALLOWED_HOSTS.some(
-    (allowed) => host === allowed || host.endsWith(`.${allowed}`),
-  );
+  return url.protocol === "https:" || url.protocol === "http:";
 }
 
 /**
@@ -66,7 +55,7 @@ export const submissionFields = z.object({
   url: z
     .url({ error: "주소 형식이 올바르지 않습니다." })
     .max(300, "주소가 너무 깁니다.")
-    .refine(isAllowedUrl, "경북대학교 관련 도메인만 받습니다. (예: *.knu.ac.kr)"),
+    .refine(isAllowedUrl, "http:// 또는 https:// 주소만 받습니다."),
   category: z.enum(CATEGORY_VALUES, { error: "분류를 선택해주세요." }),
   note: z.string().trim().max(300, "설명이 너무 깁니다.").optional(),
 });

@@ -117,9 +117,7 @@ export function SubmitSection() {
         ) : (
           <form onSubmit={onSubmit} noValidate className="relative space-y-4">
             <p className="max-w-lg text-[0.8125rem] leading-relaxed text-muted">
-              여기 없는 경북대 관련 사이트를 알고 계신가요?{" "}
-              <span className="font-mono text-ink">*.knu.ac.kr</span> 과 부속병원
-              도메인만 받습니다.
+              여기 없는 경북대 관련 사이트를 알고 계신가요? 검토 후 반영합니다.
             </p>
 
             {/*
