@@ -154,6 +154,15 @@ const RAW_LINKS = [
     keywords: ["영문", "english", "en", "외국어", "국제"],
     description: "영어권 방문자를 위한 대학 소개.",
   },
+  {
+    id: "knu-class-wizard",
+    name: "시간표 마법사",
+    url: "https://knu-class-wizard.vercel.app",
+    category: "core",
+    campus: "both",
+    requiresLogin: false,
+    keywords: ["시간표", "시간표짜기", "타임테이블", "timetable"],
+  },
 
   // ─── 수업 · 학습 ───────────────────────────────────────────
   {
